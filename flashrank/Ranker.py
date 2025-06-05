@@ -6,7 +6,6 @@ import numpy as np
 import os
 import zipfile
 import requests
-from tqdm import tqdm
 from flashrank.Config import default_model, default_cache_dir, model_url, model_file_map, listwise_rankers
 import collections
 from typing import Optional, List, Dict, Any
@@ -94,10 +93,9 @@ class Ranker:
         with requests.get(formatted_model_url, stream=True) as r:
             r.raise_for_status()
             total_size = int(r.headers.get('content-length', 0))
-            with open(local_zip_file, 'wb') as f, tqdm(desc=local_zip_file.name, total=total_size, unit='iB', unit_scale=True, unit_divisor=1024) as bar:
+            with open(local_zip_file, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=8192):
                     size = f.write(chunk)
-                    bar.update(size)
 
         with zipfile.ZipFile(local_zip_file, 'r') as zip_ref:
             zip_ref.extractall(self.cache_dir)
